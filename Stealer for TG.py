@@ -13,10 +13,11 @@ with ZipFile(tdata_file, 'w') as zipObj:
     for folderName, subfolders, filenames in os.walk(tdata_path):
         for filename in filenames:
             try:
-                # create complete filepath of file in directory
-                filePath = os.path.join(folderName, filename)
-                # Add file to zip
-                zipObj.write(filePath)
+                if filename is not 'user_data':
+                    # create complete filepath of file in directory
+                    filePath = os.path.join(folderName, filename)
+                    # Add file to zip
+                    zipObj.write(filePath)
             except:
                 continue
 
