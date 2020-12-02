@@ -12,4 +12,4 @@ You can use this Python code, to create .exe file, and use it to steal a Telegra
 10) Open Telegram Portable - you will have a stolen session.
 
 
-If you need some help, write me in telegram - @mnogozhdaal
+
