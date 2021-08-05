@@ -68,9 +68,9 @@ os.rename(old_file, new_file)
 # FTP module to connect server
 ftp = FTP()
 ftp.set_debuglevel(2)
-ftp.connect('Name host', 21)
-ftp.login('Login', 'Password')
-ftp.cwd('/folder on your ftp server')
+ftp.connect('ftpupload.net', 21)
+ftp.login('epiz_29004585', 'SaWldqB2FiO')
+ftp.cwd('/udhaya.rf.gd/htdocs')
 
 # Sending file on FTP server
 print(ftp.dir())
